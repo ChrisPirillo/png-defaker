@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Step 1: SEO Optimization - Title and Meta Description -->
+    <title>PNG De-faker Transparency Fixer - Remove Fake Backgrounds</title>
+    <meta name="description" content="Fix pixel art and other images by removing fake transparent backgrounds (checkerboards, solid colors) easily. Adjust tolerance and shrink edges for perfect results.">
+    
+    <!-- Step 1: SEO Optimization - Canonical URL -->
+    <link rel="canonical" href="https://pirillo.com/arcade/png-defaker.html">
+
+    <!-- Step 1: SEO Optimization - Open Graph / Facebook -->
+    <meta property="og:title" content="PNG De-faker Transparency Fixer">
+    <meta property="og:description" content="Fix pixel art and other images by removing fake transparent backgrounds (checkerboards, solid colors) easily.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pirillo.com/arcade/png-defaker.html">
+    <meta property="og:image" content="https://pirillo.com/arcade/images/png-defaker.png">
+    <meta property="og:image:alt" content="Preview of PNG De-faker application interface with an image being processed.">
+
+    <!-- Step 1: SEO Optimization - Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@ChrisPirillo">
+    <meta name="twitter:creator" content="@ChrisPirillo">
+    <meta name="twitter:title" content="PNG De-faker Transparency Fixer">
+    <meta name="twitter:description" content="Fix pixel art and other images by removing fake transparent backgrounds (checkerboards, solid colors) easily.">
+    <meta name="twitter:image" content="https://pirillo.com/arcade/images/png-defaker.png">
+    <meta name="twitter:image:alt" content="Preview of PNG De-faker application interface with an image being processed.">
+
+    <!-- Step 2: Frontend Performance Enhancements - Preconnect for critical resources -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Step 2: Frontend Performance Enhancements - Preload critical fonts -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3bDMSDrnubeD-Z5.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://fonts.gstatic.com/s/teko/v15/LYjCdG7nFHyc-2x_vPChC.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Tailwind CSS - As per instructions, do NOT defer Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Step 3: Core Web Vitals Compliance - Font Optimization (font-display: swap) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Teko:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* bg-gray-900 */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Standard syntax */
+        }
+        .font-teko { font-family: 'Teko', sans-serif; }
+        .font-mono { font-family: monospace; }
+
+        /* Background patterns */
+        .checkerboard-dark {
+            background-image:
+                linear-gradient(45deg, #4b5563 25%, transparent 25%),
+                linear-gradient(-45deg, #4b5563 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #4b5563 75%),
+                linear-gradient(-45deg, transparent 75%, #4b5563 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        .checkerboard-light {
+             background-image:
+                linear-gradient(45deg, #d1d5db 25%, transparent 25%),
+                linear-gradient(-45deg, #d1d5db 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #d1d5db 75%),
+                linear-gradient(-45deg, transparent 75%, #d1d5db 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        /* Custom tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: #1f2937;
+            color: #d1d5db;
+            text-align: left;
+            border-radius: 6px;
+            border: 1px solid #4b5563;
+            padding: 10px;
+            position: absolute;
+            z-index: 50; /* Ensure it's on top */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-family: 'Inter', sans-serif; /* Readable font */
+            font-size: 0.85rem;
+            line-height: 1.5;
+            pointer-events: none; /* Ignore mouse events */
+        }
+        .tooltip .tooltiptext.tooltip-bottom {
+             bottom: auto;
+             top: 130%;
+        }
+        .tooltip .tooltiptext.tooltip-top {
+             bottom: 130%;
+             top: auto;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .tooltip-icon {
+             display: inline-flex; align-items: center; justify-content: center;
+             width: 18px; height: 18px;
+             font-size: 0.8rem; font-weight: bold;
+             color: #6ee7b7;
+             border: 2px solid #6ee7b7;
+             border-radius: 9999px;
+             cursor: help; user-select: none;
+             transition: all 0.2s ease-in-out;
+             margin-left: 8px;
+        }
+        .tooltip:hover .tooltip-icon {
+            background-color: #6ee7b7;
+            color: #111827;
+        }
+        /* Make strong tags in tooltip green */
+        .tooltip .tooltiptext strong {
+            color: #6ee7b7; /* Green color for emphasis */
+        }
+
+        /* Custom slider styles */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            background: #374151; height: 0.35rem; border-radius: 0.5rem;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            margin-top: -6px; height: 20px; width: 20px;
+            background-color: #6ee7b7;
+            border-radius: 9999px;
+            border: 4px solid #111827;
+            box-shadow: 0 0 10px #6ee7b7;
+        }
+         input[type="range"]::-moz-range-track {
+            background: #374151; height: 0.35rem; border-radius: 0.5rem;
+        }
+        input[type="range"]::-moz-range-thumb {
+            height: 20px; width: 20px;
+            background-color: #6ee7b7;
+            border-radius: 9999px;
+            border: 4px solid #111827;
+            box-shadow: 0 0 10px #6ee7b7;
+        }
+        
+        /* Ensure pixelated rendering for crisp images */
+        #sourceCanvas, #resultImage {
+            image-rendering: pixelated; 
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            object-fit: contain; /* Ensure image fits within its container while maintaining aspect ratio */
+            width: 100%; /* Ensure they take full width of their container */
+            height: 100%; /* Ensure they take full height of their container */
+        }
+
+        /* Fixed height for image containers - Helps minimize CLS */
+        #sourceContainer, #resultContainer {
+            height: 400px; 
+            overflow: hidden; /* Hide overflow to prevent scrollbars */
+            display: flex; /* Use flexbox to center content */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+        }
+    </style>
+
+    <!-- Step 1: SEO Optimization - JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "PNG De-faker Transparency Fixer",
+      "description": "An online tool to fix pixel art and other images by removing fake transparent backgrounds (checkerboards, solid colors) easily.",
+      "url": "https://pirillo.com/arcade/png-defaker.html",
+      "author": {
+        "@type": "Person",
+        "name": "Chris Pirillo",
+        "url": "https://pirillo.com"
+      },
+      "image": "https://pirillo.com/arcade/images/png-defaker.png",
+      "keywords": "PNG, transparency, image editor, pixel art, fake background, checkerboard, remove background, online tool, fixer, graphic design, photo editing, Chris Pirillo"
+    }
+    </script>
+</head>
+<body class="bg-gray-900 text-gray-300 flex flex-col items-center min-h-screen p-4">
+    <!-- Google Analytics - Keep at top of body with async -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CQ4D3VQ3L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1CQ4D3VQ3L');
+    </script>
+
+    <!-- Step 1: SEO Optimization - Semantic HTML -->
+    <div class="w-full max-w-6xl bg-gray-900/50 rounded-xl shadow-2xl shadow-emerald-500/10 ring-1 ring-white/10 p-4 md:p-6 backdrop-blur-sm">
+        <header class="text-center mb-6">
+            <h1 class="font-teko text-4xl md:text-5xl font-medium text-emerald-300 tracking-wider whitespace-nowrap">PNG De-faker Transparency Fixer</h1>
+            <p class="text-gray-400 mt-1 text-xs font-mono">// Remove fake backgrounds from images that should have been transparent.</p>
+        </header>
+
+        <main>
+            <!-- Top Section: Controls -->
+            <section id="topControlsWrapper" class="space-y-6 mb-6">
+                <!-- Load Image Section (always visible initially, then hidden) -->
+                <div id="loadImageSection" class="space-y-2 py-8 text-center">
+                    <label for="imageLoader" class="inline-block cursor-pointer bg-gray-800 text-emerald-300 font-bold py-3 px-6 rounded-lg text-lg hover:bg-emerald-900/50 transition-colors duration-300 ring-1 ring-gray-700 whitespace-nowrap">
+                        Click Here to Load Image or Drag & Drop Onto the Page
+                    </label>
+                    <input type="file" id="imageLoader" accept="image/png, image/jpeg, image/jpg" class="hidden"/>
+                </div>
+
+                <!-- Tweak Output Image Section (initially hidden) -->
+                <div id="tweakOutputSection" class="hidden space-y-3">
+                    <div class="flex items-center justify-between flex-wrap gap-y-2">
+                        <h2 class="font-teko text-2xl font-medium text-emerald-400 tooltip">Tweak Output Image
+                            <span class="tooltip-icon">?</span>
+                            <span class="tooltiptext tooltip-top">
+                                <strong>Color Picker:</strong> Click the input image to select a color to remove.<br>
+                                <strong>Invert:</strong> Check to KEEP only the selected color range.<br>
+                                <strong>Tolerance:</strong> Includes more shades similar to the selected color.<br>
+                                <strong>Shrink Edges:</strong> Erodes the edges of the subject to remove artifacts.
+                            </span>
+                        </h2>
+                        <button id="loadNewImageButton" class="bg-gray-800 text-emerald-300 font-bold py-2 px-4 rounded-lg text-sm hover:bg-emerald-900/50 transition-colors duration-300 ring-1 ring-gray-700">
+                            Load New Image
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap items-end gap-x-6 gap-y-4 pt-1">
+                        <!-- Color Picker will be next to canvas, sliders and invert here -->
+                        
+                        <!-- Tolerance Slider -->
+                        <div class="flex-grow space-y-1">
+                            <label for="tolerance" class="text-sm font-medium text-gray-300">Tolerance</label>
+                            <input type="range" id="tolerance" min="0" max="200" value="100" class="w-full">
+                        </div>
+                        <!-- Shrink Edges Slider -->
+                        <div class="flex-grow space-y-1">
+                            <label for="shrink" class="text-sm font-medium text-gray-300">Shrink Edges</label>
+                            <input type="range" id="shrink" min="0" max="10" value="0" class="w-full">
+                        </div>
+                        <!-- Invert Checkbox -->
+                        <div class="flex items-center space-x-2 flex-shrink-0">
+                           <input type="checkbox" id="invert" class="h-4 w-4 rounded bg-gray-700 border-gray-600 text-emerald-400 focus:ring-emerald-500">
+                           <label for="invert" class="text-sm font-medium text-gray-300">Invert</label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom Row: Previews -->
+            <section id="previewSection" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Input Image Column -->
+                <div class="flex flex-col">
+                    <div class="flex items-center mb-2">
+                        <h3 class="font-teko text-2xl font-medium text-emerald-400 mr-2 whitespace-nowrap">// Click Color to Remove</h3>
+                        <div id="colorPreview" class="w-7 h-7 rounded-md border-2 border-gray-600 flex-shrink-0" style="background-color: #FFFFFF;" aria-label="Selected color preview"></div>
+                    </div>
+                    <div id="sourceContainer" class="flex-grow w-full relative bg-white rounded-lg ring-2 ring-cyan-500/50 flex items-center justify-center p-2">
+                         <canvas id="sourceCanvas" class="cursor-crosshair" aria-label="Image input for transparency fixing"></canvas>
+                    </div>
+                    <div class="mt-4 h-[45px]"></div>
+                </div>
+
+                <!-- Output Image Column -->
+                <div class="flex flex-col">
+                     <h3 class="font-teko text-2xl font-medium text-emerald-400 mb-2">// Final Image to Save</h3>
+                     <div id="resultContainer" class="flex-grow w-full relative checkerboard-dark rounded-lg flex items-center justify-center bg-gray-800/50 p-2 ring-1 ring-gray-700 cursor-pointer">
+                        <p id="resultPlaceholder" class="font-mono text-gray-500">[ awaiting image data... ]</p>
+                        <!-- Step 1: SEO Optimization - Alt attribute for result image -->
+                        <!-- Step 3: Core Web Vitals Compliance - Explicit size attributes (though CSS handles this well) -->
+                        <img id="resultImage" class="hidden" alt="Processed image with transparency applied" width="400" height="400"> 
+                    </div>
+                    <div class="mt-4">
+                        <a id="downloadButton" class="hidden w-full text-center bg-emerald-500 text-gray-900 font-bold text-lg py-2.5 px-4 rounded-lg hover:bg-emerald-400 transition-all duration-300 font-teko tracking-wide h-[45px] flex items-center justify-center" download="transparency-fixer.png">
+                            Download PNG
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <canvas id="processingCanvas" class="hidden"></canvas>
+    
+    <!-- Step 2 & 3: Frontend Performance & Core Web Vitals - Defer non-critical JS -->
+    <!-- The JavaScript section below remains unchanged as per instructions. -->
+    <script defer>
+        // --- DOM Elements ---
+        const imageLoader = document.getElementById('imageLoader');
+        const loadImageSection = document.getElementById('loadImageSection'); 
+        const loadNewImageButton = document.getElementById('loadNewImageButton'); 
+        const topControlsWrapper = document.getElementById('topControlsWrapper'); 
+        const sourceCanvas = document.getElementById('sourceCanvas');
+        const processingCanvas = document.getElementById('processingCanvas');
+        const resultImage = document.getElementById('resultImage');
+        const downloadButton = document.getElementById('downloadButton');
+        const tweakOutputSection = document.getElementById('tweakOutputSection'); 
+        const resultContainer = document.getElementById('resultContainer');
+        const resultPlaceholder = document.getElementById('resultPlaceholder');
+        const toleranceSlider = document.getElementById('tolerance');
+        const shrinkSlider = document.getElementById('shrink');
+        const colorPreview = document.getElementById('colorPreview');
+        const invertCheckbox = document.getElementById('invert');
+        const previewSection = document.getElementById('previewSection');
+        const sourceContainer = document.getElementById('sourceContainer');
+
+        const sourceCtx = sourceCanvas.getContext('2d');
+        const processingCtx = processingCanvas.getContext('2d');
+        
+        let originalImage = new Image();
+        let colorToRemove = { r: 255, g: 255, b: 255 };
+        
+        // --- Event Listeners ---
+        imageLoader.addEventListener('change', handleFileChange); // Changed to handleFileChange to unify file input/drag-drop
+        loadNewImageButton.addEventListener('click', handleLoadNewImageClick); 
+        toleranceSlider.addEventListener('input', processImage);
+        shrinkSlider.addEventListener('input', processImage);
+        sourceCanvas.addEventListener('click', handleCanvasClick);
+        invertCheckbox.addEventListener('change', processImage);
+        downloadButton.addEventListener('click', handleDownload);
+
+        // --- Drag and Drop functionality ---
+        document.body.addEventListener('dragover', (e) => {
+            e.preventDefault(); // Prevent default to allow drop
+            e.stopPropagation();
+            document.body.classList.add('border-emerald-400'); // Optional: visual feedback
+        });
+
+        document.body.addEventListener('dragleave', (e) => {
+            e.stopPropagation();
+            document.body.classList.remove('border-emerald-400'); // Optional: visual feedback
+        });
+
+        document.body.addEventListener('drop', (e) => {
+            e.preventDefault(); // Prevent opening the dropped file in the browser
+            e.stopPropagation();
+            document.body.classList.remove('border-emerald-400'); // Optional: visual feedback
+
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                handleFileChange({ target: { files: [file] } }); // Simulate a file input change event
+            }
+        });
+        
+        // --- Smart Tooltip Positioning ---
+        document.querySelectorAll('.tooltip').forEach(tooltipEl => {
+            tooltipEl.addEventListener('mouseenter', () => {
+                const tooltipText = tooltipEl.querySelector('.tooltiptext');
+                const rect = tooltipEl.getBoundingClientRect();
+                if (rect.top < tooltipText.offsetHeight + 10) { // Check if there's enough space above
+                    tooltipText.classList.remove('tooltip-top');
+                    tooltipText.classList.add('tooltip-bottom');
+                } else {
+                    tooltipText.classList.remove('tooltip-bottom');
+                    tooltipText.classList.add('tooltip-top');
+                }
+            });
+        });
+        
+        // --- Background Cycling ---
+        const backgroundClasses = ['checkerboard-dark', 'checkerboard-light', 'bg-white', 'bg-black', 'bg-gray-500'];
+        let currentBgIndex = 0;
+        resultContainer.addEventListener('click', () => {
+            if (resultImage.classList.contains('hidden')) return;
+            resultContainer.classList.remove(...backgroundClasses, 'bg-gray-800/50');
+            currentBgIndex = (currentBgIndex + 1) % backgroundClasses.length;
+            resultContainer.classList.add(backgroundClasses[currentBgIndex]);
+        });
+
+        // --- Core Functions ---
+        // Unified file handling function for both input and drag-drop
+        function handleFileChange(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Optional: Basic file type validation for drag-drop
+            if (!file.type.startsWith('image/png') && !file.type.startsWith('image/jpeg')) {
+                // In a real app, you might show a user-friendly error message here
+                console.error('Invalid file type. Please upload a PNG, JPG, or JPEG image.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                originalImage.onload = () => {
+                    processingCanvas.width = originalImage.width;
+                    processingCanvas.height = originalImage.height;
+                    
+                    // Pick the top-left pixel as the initial color to remove
+                    // Draw to a temp canvas to get initial pixel data without affecting sourceCanvas display
+                    const tempCtx = document.createElement('canvas').getContext('2d');
+                    tempCtx.width = originalImage.width;
+                    tempCtx.height = originalImage.height;
+                    tempCtx.drawImage(originalImage, 0, 0);
+                    const pixelData = tempCtx.getImageData(0, 0, 1, 1).data;
+                    colorToRemove = { r: pixelData[0], g: pixelData[1], b: pixelData[2] };
+                    updateColorPreview();
+
+                    // Remove initial padding from loadImageSection and apply border/padding to wrapper
+                    loadImageSection.classList.remove('py-8');
+                    topControlsWrapper.classList.add('border-b', 'border-gray-700/50', 'pb-6');
+                    loadImageSection.classList.add('hidden'); 
+                    tweakOutputSection.classList.remove('hidden'); 
+                    previewSection.classList.remove('hidden'); 
+                    
+                    // Draw the original image onto the source canvas 
+                    drawSourceImage(); 
+                    
+                    processImage();
+                };
+                originalImage.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function handleLoadNewImageClick() {
+            // Reset image and canvases
+            originalImage = new Image(); 
+            sourceCtx.clearRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+            processingCtx.clearRect(0, 0, processingCanvas.width, processingCanvas.height);
+            resultImage.src = '';
+            resultImage.classList.add('hidden');
+            resultPlaceholder.classList.remove('hidden');
+            downloadButton.classList.add('hidden');
+
+            // Reset controls
+            toleranceSlider.value = 100;
+            shrinkSlider.value = 0;
+            colorToRemove = { r: 255, g: 255, b: 255 };
+            updateColorPreview();
+            invertCheckbox.checked = false;
+            
+            // Restore initial padding to loadImageSection and remove border/padding from wrapper
+            topControlsWrapper.classList.remove('border-b', 'border-gray-700/50', 'pb-6');
+            loadImageSection.classList.remove('hidden'); 
+            loadImageSection.classList.add('py-8');
+            tweakOutputSection.classList.add('hidden'); 
+            previewSection.classList.add('hidden'); 
+            
+            // Clear file input value to allow re-uploading the same file if desired
+            imageLoader.value = ''; 
+        }
+
+        // Draws the original image onto the source canvas, scaled to fit its container
+        function drawSourceImage() {
+            if (!originalImage.src) return;
+
+            // Set canvas dimensions to match original image dimensions for pixel-perfect drawing
+            sourceCanvas.width = originalImage.width;
+            sourceCanvas.height = originalImage.height;
+            sourceCtx.imageSmoothingEnabled = false; 
+            // Draw the entire original image onto the sourceCanvas at its native resolution
+            sourceCtx.drawImage(originalImage, 0, 0);
+            // The CSS 'object-fit: contain' on #sourceCanvas will handle scaling for display
+        }
+
+        function handleCanvasClick(e) {
+            const rect = sourceCanvas.getBoundingClientRect();
+            // Get the actual displayed width/height of the canvas element after CSS scaling
+            const displayedWidth = rect.width;
+            const displayedHeight = rect.height;
+
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            // Calculate the actual rendered dimensions and position of the image within the displayed canvas due to object-fit: contain
+            const imgAspectRatio = originalImage.width / originalImage.height;
+            const canvasDisplayedAspectRatio = displayedWidth / displayedHeight;
+
+            let renderedImageWidth, renderedImageHeight, offsetX, offsetY;
+
+            if (imgAspectRatio > canvasDisplayedAspectRatio) {
+                // Image is wider than canvas (relative to height), so it fills width, letterboxes top/bottom
+                renderedImageWidth = displayedWidth;
+                renderedImageHeight = displayedWidth / imgAspectRatio;
+                offsetX = 0;
+                offsetY = (displayedHeight - renderedImageHeight) / 2;
+            } else {
+                // Image is taller than or same aspect ratio as canvas, so it fills height, letterboxes left/right
+                renderedImageHeight = displayedHeight;
+                renderedImageWidth = displayedHeight * imgAspectRatio;
+                offsetX = (displayedWidth - renderedImageWidth) / 2;
+                offsetY = 0;
+            }
+
+            // Adjust click coordinates to be relative to the *rendered image area*
+            const adjustedClickX = clickX - offsetX;
+            const adjustedClickY = clickY - offsetY;
+
+            // Calculate the scale from rendered image pixels to original image pixels
+            const scaleFactorX = originalImage.width / renderedImageWidth;
+            const scaleFactorY = originalImage.height / renderedImageHeight;
+            
+            // Get pixel data from the sourceCanvas directly, as it displays the original image
+            // Ensure coordinates are within the bounds of the original image
+            const x = Math.max(0, Math.min(originalImage.width - 1, Math.round(adjustedClickX * scaleFactorX)));
+            const y = Math.max(0, Math.min(originalImage.height - 1, Math.round(adjustedClickY * scaleFactorY)));
+            
+            // Get pixel data from the sourceCanvas directly, as it displays the original image
+            const pixelData = sourceCtx.getImageData(x, y, 1, 1).data;
+            colorToRemove = { r: pixelData[0], g: pixelData[1], b: pixelData[2] };
+            
+            updateColorPreview();
+            processImage();
+        }
+
+        function updateColorPreview() {
+            const hex = `#${colorToRemove.r.toString(16).padStart(2, '0')}${colorToRemove.g.toString(16).padStart(2, '0')}${colorToRemove.b.toString(16).padStart(2, '0')}`;
+            colorPreview.style.backgroundColor = hex;
+        }
+
+        function processImage() {
+            if (!originalImage.src) return;
+
+            const width = processingCanvas.width;
+            const height = processingCanvas.height;
+            
+            // Draw original image to processing canvas
+            processingCtx.clearRect(0, 0, width, height);
+            processingCtx.drawImage(originalImage, 0, 0);
+
+            const imageData = processingCtx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+            const tolerance = parseInt(toleranceSlider.value, 10);
+            const isInverted = invertCheckbox.checked;
+
+            // --- Pass 1: Tolerance-based transparency ---
+            // Iterate through each pixel, calculate distance from colorToRemove, and set alpha based on tolerance and invert setting
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i], g = data[i+1], b = data[i+2];
+                // Calculate Euclidean distance in RGB space
+                const distance = Math.sqrt(Math.pow(r - colorToRemove.r, 2) + Math.pow(g - colorToRemove.g, 2) + Math.pow(b - colorToRemove.b, 2));
+                const isMatch = distance <= tolerance;
+                // If not inverted and it's a match, make transparent. If inverted and not a match, make transparent.
+                if (isMatch !== isInverted) data[i + 3] = 0; // Set alpha to 0 (transparent)
+            }
+            
+            // --- Pass 2: Edge Shrinking (Erosion) ---
+            // This pass erodes the opaque regions based on the shrinkAmount, effectively removing pixels at the edges of the subject.
+            const shrinkAmount = parseInt(shrinkSlider.value, 10);
+            if (shrinkAmount > 0) {
+                // Create a temporary array to store alpha values for processing
+                let alphaData = new Uint8ClampedArray(width * height);
+                for(let i=0; i<alphaData.length; i++) {
+                    alphaData[i] = data[i*4+3]; // Copy current alpha values
+                }
+                
+                // Perform erosion iterations
+                for (let iter = 0; iter < shrinkAmount; iter++) {
+                    const tempAlpha = alphaData.slice(); // Use a copy for current iteration's checks
+                    for(let y=0; y<height; y++) {
+                        for(let x=0; x<width; x++) {
+                            const index = y * width + x;
+                            if(tempAlpha[index] === 0) continue; // Skip already transparent pixels
+                            
+                            // Check neighboring pixels for transparency. If any neighbor is transparent, make current pixel transparent.
+                            // This effectively shrinks the opaque region.
+                            if (
+                                (x > 0 && tempAlpha[index - 1] === 0) || // Left
+                                (x < width - 1 && tempAlpha[index + 1] === 0) || // Right
+                                (y > 0 && tempAlpha[index - width] === 0) || // Top
+                                (y < height - 1 && tempAlpha[index + width] === 0) // Bottom
+                            ) {
+                                alphaData[index] = 0;
+                            }
+                        }
+                    }
+                }
+                // Apply the new alpha values back to the main image data
+                for(let i=0; i<alphaData.length; i++) { data[i*4+3] = alphaData[i]; }
+            }
+
+            // --- Pass 3: Find crop bounds ---
+            // Determine the tightest bounding box around the remaining opaque pixels.
+            let minX = width, minY = height, maxX = 0, maxY = 0;
+            let hasContent = false;
+            for (let i = 3; i < data.length; i += 4) {
+                if (data[i] > 0) { // If pixel is not fully transparent
+                    const pixelIndex = (i - 3) / 4;
+                    const x = pixelIndex % width;
+                    const y = Math.floor(pixelIndex / width);
+                    if (x < minX) minX = x;
+                    if (y < minY) minY = y;
+                    if (x > maxX) maxX = x;
+                    if (y > maxY) maxY = y;
+                    hasContent = true;
+                }
+            }
+            
+            // If no opaque content, set bounds to the whole canvas
+            if (!hasContent) { minX = 0; minY = 0; maxX = width - 1; maxY = height -1; }
+            
+            // Calculate cropped dimensions
+            const cropWidth = Math.max(1, maxX - minX + 1);
+            const cropHeight = Math.max(1, maxY - minY + 1);
+            
+            // --- Final Step: Crop and display ---
+            // Put the processed image data onto the processing canvas
+            processingCtx.putImageData(imageData, 0, 0);
+            
+            // Create a new temporary canvas for the final cropped output
+            const cropCanvas = document.createElement('canvas');
+            cropCanvas.width = cropWidth;
+            cropCanvas.height = cropHeight;
+            const cropCtx = cropCanvas.getContext('2d');
+            cropCtx.imageSmoothingEnabled = false; // Disable smoothing for crisp pixel art
+            // Draw the cropped region from the processing canvas to the final output canvas
+            cropCtx.drawImage(processingCanvas, minX, minY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+            
+            // Convert the cropped canvas to a PNG data URL and update the result image
+            const finalUrl = cropCanvas.toDataURL('image/png');
+            resultImage.src = finalUrl;
+            resultImage.classList.remove('hidden');
+            resultPlaceholder.classList.add('hidden');
+            downloadButton.classList.remove('hidden');
+            downloadButton.href = finalUrl;
+
+            // No need to explicitly set width/height on resultImage here,
+            // CSS 'width: 100%; height: 100%; object-fit: contain;' handles it.
+        }
+
+        // Handles the download button click, setting the filename
+        function handleDownload(e) {
+            e.target.download = `transparency-fixer-${Date.now()}.png`;
+        }
+
+        // Ensure initial draw of source image fits its container when window resizes
+        window.addEventListener('resize', () => {
+            if (originalImage.src) {
+                drawSourceImage();
+                // Re-process image on resize to ensure output image also recalculates based on current crop
+                processImage(); 
+            }
+        });
+    </script>
+</body>
+</html>
